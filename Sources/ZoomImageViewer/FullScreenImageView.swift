@@ -14,6 +14,7 @@ struct FullScreenImageView<CloseButtonStyle: ButtonStyle>: View {
     init(uiImage: Binding<UIImage?>, closeButtonStyle: CloseButtonStyle, onDismiss: (() -> Void)? = nil) {
         self._uiImage = uiImage
         self.closeButtonStyle = closeButtonStyle
+        self.onDismiss = onDismiss
     }
     var onDismiss: (() -> Void)? // Optional closure called when the view disappears
     @State private var isInteractive: Bool = true
