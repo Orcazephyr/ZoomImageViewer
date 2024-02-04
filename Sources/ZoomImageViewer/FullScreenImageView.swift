@@ -11,11 +11,11 @@ struct FullScreenImageView<CloseButtonStyle: ButtonStyle>: View {
     @Binding var uiImage: UIImage?
     let closeButtonStyle: CloseButtonStyle
     
-    init(uiImage: Binding<UIImage?>, closeButtonStyle: CloseButtonStyle) {
+    init(uiImage: Binding<UIImage?>, closeButtonStyle: CloseButtonStyle, onDismiss: (() -> Void)? = nil) {
         self._uiImage = uiImage
         self.closeButtonStyle = closeButtonStyle
     }
-    
+    var onDismiss: (() -> Void)? // Optional closure called when the view disappears
     @State private var isInteractive: Bool = true
     @State private var zoomState: ZoomState = .min
     @State private var offset: CGSize = .zero
@@ -118,6 +118,7 @@ struct FullScreenImageView<CloseButtonStyle: ButtonStyle>: View {
     func onDisappear() {
         backgroundOpacity = .zero
         imageOpacity = .zero
+        
     }
     
     func onDrag(translation: CGSize) {
@@ -135,6 +136,7 @@ struct FullScreenImageView<CloseButtonStyle: ButtonStyle>: View {
             withAnimation(Animation.linear(duration: 0.1).delay(animationSpeed)) {
                 uiImage = nil
             }
+            onDismiss?()
         } else {
             isInteractive = true
             withAnimation(Animation.easeOut) {
