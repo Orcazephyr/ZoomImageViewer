@@ -118,7 +118,7 @@ struct FullScreenImageView<CloseButtonStyle: ButtonStyle>: View {
     func onDisappear() {
         backgroundOpacity = .zero
         imageOpacity = .zero
-        
+        onDismiss!()
     }
     
     func onDrag(translation: CGSize) {
@@ -136,7 +136,6 @@ struct FullScreenImageView<CloseButtonStyle: ButtonStyle>: View {
             withAnimation(Animation.linear(duration: 0.1).delay(animationSpeed)) {
                 uiImage = nil
             }
-            onDismiss?()
         } else {
             isInteractive = true
             withAnimation(Animation.easeOut) {
