@@ -11,6 +11,7 @@ import UIKit
 struct FullScreenImageView<CloseButtonStyle: ButtonStyle>: View {
     @Binding var uiImage: UIImage?
     var watermark: UIImage?
+    var baseImage: UIImage?
     let closeButtonStyle: CloseButtonStyle
     
     init(uiImage: Binding<UIImage?>, closeButtonStyle: CloseButtonStyle, onDismiss: (() -> Void)? = nil, watermark: UIImage?) {
@@ -18,6 +19,7 @@ struct FullScreenImageView<CloseButtonStyle: ButtonStyle>: View {
         self.closeButtonStyle = closeButtonStyle
         self.onDismiss = onDismiss
         self.watermark = watermark
+        self.baseImage = uiImage.wrappedValue
     }
     var onDismiss: (() -> Void)? // Optional closure called when the view disappears
     @State private var isInteractive: Bool = true
@@ -102,7 +104,7 @@ struct FullScreenImageView<CloseButtonStyle: ButtonStyle>: View {
                                 .opacity(backgroundOpacity)
                                 Button {
                                     // Share watermarked image
-                                    let watermarked = watermarkImage(baseImage: self._uiImage ?? UIImage(), watermarkImage: watermark ?? UIImage())
+                                    let watermarked = watermarkImage(baseImage: baseImage ?? UIImage(), watermarkImage: watermark ?? UIImage())
                                     self.image = watermarked
                                     showShareSheet = true
                                 } label: {
