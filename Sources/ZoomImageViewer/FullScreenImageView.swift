@@ -47,7 +47,7 @@ struct FullScreenImageView<CloseButtonStyle: ButtonStyle>: View {
                 predictedOffset = value.predictedEndTranslation
             }
     }
-    @State private var image = UIImage(named: "exampleImage")!
+    @State private var image = UIImage()
     @State private var showShareSheet = false
 
     var body: some View {
