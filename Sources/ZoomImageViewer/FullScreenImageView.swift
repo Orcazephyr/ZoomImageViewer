@@ -208,7 +208,7 @@ func watermarkImage(baseImage: UIImage, watermarkImage: UIImage) -> UIImage? {
         let marginY = baseImage.size.height * 0.05
         let watermarkX = baseImage.size.width - watermarkWidth - marginX
         let watermarkY = baseImage.size.height - watermarkHeight - marginY
-        let watermarkRect = CGRect(x: watermarkX, y: watermarkY, size: CGSize(width: watermarkWidth, height: watermarkHeight))
+        let watermarkRect = CGRect(x: watermarkX, y: watermarkY, width: watermarkWidth, height: watermarkHeight)
 
         // Draw the watermark image
         watermarkImage.draw(in: watermarkRect, blendMode: .normal, alpha: 0.5)  // Adjust alpha as desired
