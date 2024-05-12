@@ -69,7 +69,7 @@ struct FullScreenImageView<CloseButtonStyle: ButtonStyle>: View {
                                 Button {
                                     // Share watermarked image
                                     let watermarked = watermarkImage(baseImage: baseImage ?? UIImage(), watermarkImage: watermark ?? UIImage())
-                                    self.image = watermarked
+                                    self.image = watermarked ?? baseImage ?? UIImage()
                                     showShareSheet = true
                                 } label: {
                                     Image(systemName: "square.and.arrow.up")
