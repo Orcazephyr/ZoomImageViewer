@@ -184,17 +184,17 @@ struct ActivityView: UIViewControllerRepresentable {
     }
 }
 
-func watermarkImage(baseImage: UIImage, watermarkImage: UIImage, position: CGPoint) -> UIImage? {
+func watermarkImage(baseImage: UIImage, watermarkImage: UIImage) -> UIImage? {
     let renderer = UIGraphicsImageRenderer(size: baseImage.size)
     
     let watermarkedImage = renderer.image { context in
-        // Draw base image
+        // Draw the base image
         baseImage.draw(at: .zero)
         
-        // Calculate watermark size while maintaining aspect ratio
-        let scale = 0.1  // Watermark size as a fraction of the base image size
+        // Define the scale as 10% of the base image's shorter dimension
+        let scale = 0.1
         let watermarkAspect = watermarkImage.size.width / watermarkImage.size.height
-        var watermarkHeight = baseImage.size.height * scale
+        var watermarkHeight = min(baseImage.size.width, baseImage.size.height) * scale
         var watermarkWidth = watermarkHeight * watermarkAspect
 
         // Ensure the watermark does not exceed 10% of image's width
@@ -203,8 +203,14 @@ func watermarkImage(baseImage: UIImage, watermarkImage: UIImage, position: CGPoi
             watermarkHeight = watermarkWidth / watermarkAspect
         }
 
-        // Position the watermark at the specified position
-        let watermarkRect = CGRect(x: position.x, y: position.y, width: watermarkWidth, height: watermarkHeight)
+        // Calculate position to place it at the bottom right corner with a 5% margin
+        let marginX = baseImage.size.width * 0.05
+        let marginY = baseImage.size.height * 0.05
+        let watermarkX = baseImage.size.width - watermarkWidth - marginX
+        let watermarkY = baseImage.size.height - watermarkHeight - marginY
+        let watermarkRect = CGRect(x: watermarkX, y: watermarkY, size: CGSize(width: watermarkWidth, height: watermarkHeight))
+
+        // Draw the watermark image
         watermarkImage.draw(in: watermarkRect, blendMode: .normal, alpha: 0.5)  // Adjust alpha as desired
     }
 
