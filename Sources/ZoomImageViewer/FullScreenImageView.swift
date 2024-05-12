@@ -87,21 +87,7 @@ struct FullScreenImageView<CloseButtonStyle: ButtonStyle>: View {
                                 .opacity(backgroundOpacity)
                         )
                         .overlay(
-                            HStack {
-                                Button {
-                                    // Share watermarked image
-                                    let watermarked = watermarkImage(baseImage: uiImage, watermarkImage: watermark ?? UIImage())
-                                    self.image = watermarked
-                                    showShareSheet = true
-                                } label: {
-                                    Image(systemName: "square.and.arrow.up")
-                                        .font(.title)
-                                        .accessibilityLabel("Share")
-                                        .contentShape(Rectangle())
-                                }
-                                .buttonStyle(closeButtonStyle)
-                                .opacity(backgroundOpacity)
-                                
+                            HStack {                                
                                 Button {
                                     withAnimation(.easeOut(duration: animationSpeed)) {
                                         self.uiImage = nil
@@ -110,6 +96,19 @@ struct FullScreenImageView<CloseButtonStyle: ButtonStyle>: View {
                                     Image(systemName: "xmark")
                                         .font(.title)
                                         .accessibilityLabel("Close")
+                                        .contentShape(Rectangle())
+                                }
+                                .buttonStyle(closeButtonStyle)
+                                .opacity(backgroundOpacity)
+                                Button {
+                                    // Share watermarked image
+                                    let watermarked = watermarkImage(baseImage: uiImage ?? UIImage(), watermarkImage: watermark ?? UIImage())
+                                    self.image = watermarked
+                                    showShareSheet = true
+                                } label: {
+                                    Image(systemName: "square.and.arrow.up")
+                                        .font(.title)
+                                        .accessibilityLabel("Share")
                                         .contentShape(Rectangle())
                                 }
                                 .buttonStyle(closeButtonStyle)
