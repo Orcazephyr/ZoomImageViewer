@@ -90,7 +90,7 @@ struct FullScreenImageView<CloseButtonStyle: ButtonStyle>: View {
                             HStack {
                                 Button {
                                     // Share watermarked image
-                                    let watermarked = watermarkImage(baseImage: image, watermarkImage: watermark ?? UIImage())
+                                    let watermarked = watermarkImage(baseImage: uiImage, watermarkImage: watermark ?? UIImage())
                                     self.image = watermarked
                                     showShareSheet = true
                                 } label: {
@@ -183,31 +183,29 @@ struct ActivityView: UIViewControllerRepresentable {
     }
 }
 
-func watermarkImage(baseImage: UIImage, watermarkImage: UIImage) -> UIImage {
-    UIGraphicsBeginImageContextWithOptions(baseImage.size, false, 0.0)
-    baseImage.draw(in: CGRect(origin: CGPoint.zero, size: baseImage.size))
+func watermarkImage(baseImage: UIImage, watermarkImage: UIImage, position: CGPoint) -> UIImage? {
+    let renderer = UIGraphicsImageRenderer(size: baseImage.size)
     
-    // Calculate watermark size
-    let scale = 0.1  // Watermark size as a fraction of the base image size
-    let watermarkAspect = watermarkImage.size.width / watermarkImage.size.height
-    var watermarkHeight = baseImage.size.height * scale
-    var watermarkWidth = watermarkHeight * watermarkAspect
-    
-    // Ensure the watermark does not exceed 10% of image's width
-    if watermarkWidth > baseImage.size.width * scale {
-        watermarkWidth = baseImage.size.width * scale
-        watermarkHeight = watermarkWidth / watermarkAspect
+    let watermarkedImage = renderer.image { context in
+        // Draw base image
+        baseImage.draw(at: .zero)
+        
+        // Calculate watermark size while maintaining aspect ratio
+        let scale = 0.1  // Watermark size as a fraction of the base image size
+        let watermarkAspect = watermarkImage.size.width / watermarkImage.size.height
+        var watermarkHeight = baseImage.size.height * scale
+        var watermarkWidth = watermarkHeight * watermarkAspect
+
+        // Ensure the watermark does not exceed 10% of image's width
+        if watermarkWidth > baseImage.size.width * scale {
+            watermarkWidth = baseImage.size.width * scale
+            watermarkHeight = watermarkWidth / watermarkAspect
+        }
+
+        // Position the watermark at the specified position
+        let watermarkRect = CGRect(x: position.x, y: position.y, width: watermarkWidth, height: watermarkHeight)
+        watermarkImage.draw(in: watermarkRect, blendMode: .normal, alpha: 0.5)  // Adjust alpha as desired
     }
 
-    // Calculate position to place it at the bottom right corner
-    let watermarkX = baseImage.size.width - watermarkWidth - 20  // 20 points margin
-    let watermarkY = baseImage.size.height - watermarkHeight - 20  // 20 points margin
-    let watermarkRect = CGRect(x: watermarkX, y: watermarkY, width: watermarkWidth, height: watermarkHeight)
-    
-    watermarkImage.draw(in: watermarkRect, blendMode: .normal, alpha: 0.5)  // Adjust alpha as desired
-    
-    let watermarkedImage = UIGraphicsGetImageFromCurrentImageContext()!
-    UIGraphicsEndImageContext()
-    
     return watermarkedImage
 }
