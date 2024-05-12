@@ -102,7 +102,7 @@ struct FullScreenImageView<CloseButtonStyle: ButtonStyle>: View {
                                 .opacity(backgroundOpacity)
                                 Button {
                                     // Share watermarked image
-                                    let watermarked = watermarkImage(baseImage: uiImage ?? UIImage(), watermarkImage: watermark ?? UIImage())
+                                    let watermarked = watermarkImage(baseImage: self._uiImage ?? UIImage(), watermarkImage: watermark ?? UIImage())
                                     self.image = watermarked
                                     showShareSheet = true
                                 } label: {
