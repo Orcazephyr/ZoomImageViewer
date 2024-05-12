@@ -52,6 +52,36 @@ struct FullScreenImageView<CloseButtonStyle: ButtonStyle>: View {
     @State private var image = UIImage()
     @State private var showShareSheet = false
 
+    private var buttons: some View {
+        HStack {                                
+                                Button {
+                                    withAnimation(.easeOut(duration: animationSpeed)) {
+                                        self.uiImage = nil
+                                    }
+                                } label: {
+                                    Image(systemName: "xmark")
+                                        .font(.title)
+                                        .accessibilityLabel("Close")
+                                        .contentShape(Rectangle())
+                                }
+                                .buttonStyle(closeButtonStyle)
+                                .opacity(backgroundOpacity)
+                                Button {
+                                    // Share watermarked image
+                                    let watermarked = watermarkImage(baseImage: baseImage ?? UIImage(), watermarkImage: watermark ?? UIImage())
+                                    self.image = watermarked
+                                    showShareSheet = true
+                                } label: {
+                                    Image(systemName: "square.and.arrow.up")
+                                        .font(.title)
+                                        .accessibilityLabel("Share")
+                                        .contentShape(Rectangle())
+                                }
+                                .buttonStyle(closeButtonStyle)
+                                .opacity(backgroundOpacity)
+        }
+    }
+
     var body: some View {
         /// This helps center animated rotations
         Color.clear.overlay(
@@ -89,33 +119,8 @@ struct FullScreenImageView<CloseButtonStyle: ButtonStyle>: View {
                                 .opacity(backgroundOpacity)
                         )
                         .overlay(
-                            HStack {                                
-                                Button {
-                                    withAnimation(.easeOut(duration: animationSpeed)) {
-                                        self.uiImage = nil
-                                    }
-                                } label: {
-                                    Image(systemName: "xmark")
-                                        .font(.title)
-                                        .accessibilityLabel("Close")
-                                        .contentShape(Rectangle())
-                                }
-                                .buttonStyle(closeButtonStyle)
-                                .opacity(backgroundOpacity)
-                                Button {
-                                    // Share watermarked image
-                                    let watermarked = watermarkImage(baseImage: baseImage ?? UIImage(), watermarkImage: watermark ?? UIImage())
-                                    self.image = watermarked
-                                    showShareSheet = true
-                                } label: {
-                                    Image(systemName: "square.and.arrow.up")
-                                        .font(.title)
-                                        .accessibilityLabel("Share")
-                                        .contentShape(Rectangle())
-                                }
-                                .buttonStyle(closeButtonStyle)
-                                .opacity(backgroundOpacity)
-                            }, alignment: .topLeading
+                            buttons
+                            , alignment: .topLeading
                         )
                         .sheet(isPresented: $showShareSheet, content: {
                             ActivityView(activityItems: [image] as [Any], applicationActivities: nil)
