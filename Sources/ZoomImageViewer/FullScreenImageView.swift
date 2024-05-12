@@ -10,10 +10,10 @@ import UIKit
 
 struct FullScreenImageView<CloseButtonStyle: ButtonStyle>: View {
     @Binding var uiImage: UIImage?
-    @Binding var watermark: UIImage? = UIImage()
+    @Binding var watermark: UIImage?
     let closeButtonStyle: CloseButtonStyle
     
-    init(uiImage: Binding<UIImage?>, closeButtonStyle: CloseButtonStyle, onDismiss: (() -> Void)? = nil, watermark: UIImage) {
+    init(uiImage: Binding<UIImage?>, closeButtonStyle: CloseButtonStyle, onDismiss: (() -> Void)? = nil, watermark: Binding<UIImage?>) {
         self._uiImage = uiImage
         self.closeButtonStyle = closeButtonStyle
         self.onDismiss = onDismiss
