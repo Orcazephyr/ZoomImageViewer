@@ -6,9 +6,11 @@
 //
 
 import SwiftUI
+import UIKit
 
 struct FullScreenImageView<CloseButtonStyle: ButtonStyle>: View {
     @Binding var uiImage: UIImage?
+    @Binding var watermark: UIImage?
     let closeButtonStyle: CloseButtonStyle
     
     init(uiImage: Binding<UIImage?>, closeButtonStyle: CloseButtonStyle, onDismiss: (() -> Void)? = nil) {
@@ -44,7 +46,9 @@ struct FullScreenImageView<CloseButtonStyle: ButtonStyle>: View {
                 predictedOffset = value.predictedEndTranslation
             }
     }
-    
+    @State private var image = UIImage(named: "exampleImage")!
+    @State private var showShareSheet = false
+
     var body: some View {
         /// This helps center animated rotations
         Color.clear.overlay(
@@ -82,20 +86,38 @@ struct FullScreenImageView<CloseButtonStyle: ButtonStyle>: View {
                                 .opacity(backgroundOpacity)
                         )
                         .overlay(
-                            Button {
-                                withAnimation(.easeOut(duration: animationSpeed)) {
-                                    self.uiImage = nil
+                            HStack {
+                                Button {
+                                    // Share watermarked image
+                                    let watermarked = watermarkImage(baseImage: image, watermarkImage: watermark ?? UIImage())
+                                    self.image = watermarked
+                                    showShareSheet = true
+                                } label: {
+                                    Image(systemName: "square.and.arrow.up")
+                                        .font(.title)
+                                        .accessibilityLabel("Share")
+                                        .contentShape(Rectangle())
                                 }
-                            } label: {
-                                Image(systemName: "xmark")
-                                    .font(.title)
-                                    .accessibilityLabel("Close")
-                                    .contentShape(Rectangle())
-                            }
                                 .buttonStyle(closeButtonStyle)
                                 .opacity(backgroundOpacity)
-                            , alignment: .topLeading
+                                
+                                Button {
+                                    withAnimation(.easeOut(duration: animationSpeed)) {
+                                        self.uiImage = nil
+                                    }
+                                } label: {
+                                    Image(systemName: "xmark")
+                                        .font(.title)
+                                        .accessibilityLabel("Close")
+                                        .contentShape(Rectangle())
+                                }
+                                .buttonStyle(closeButtonStyle)
+                                .opacity(backgroundOpacity)
+                            }, alignment: .topLeading
                         )
+                        .sheet(isPresented: $showShareSheet, content: {
+                            ActivityView(activityItems: [image] as [Any], applicationActivities: nil)
+                        })
                         .opacity(imageOpacity)
                         .onAppear(perform: onAppear)
                         .onDisappear(perform: onDisappear)
@@ -145,4 +167,46 @@ struct FullScreenImageView<CloseButtonStyle: ButtonStyle>: View {
             }
         }
     }
+}
+
+struct ActivityView: UIViewControllerRepresentable {
+    var activityItems: [Any]
+    var applicationActivities: [UIActivity]?
+
+    func makeUIViewController(context: UIViewControllerRepresentableContext<ActivityView>) -> UIActivityViewController {
+        let controller = UIActivityViewController(activityItems: activityItems, applicationActivities: applicationActivities)
+        return controller
+    }
+    
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: UIViewControllerRepresentableContext<ActivityView>) {
+    }
+}
+
+func watermarkImage(baseImage: UIImage, watermarkImage: UIImage) -> UIImage {
+    UIGraphicsBeginImageContextWithOptions(baseImage.size, false, 0.0)
+    baseImage.draw(in: CGRect(origin: CGPoint.zero, size: baseImage.size))
+    
+    // Calculate watermark size
+    let scale = 0.1  // Watermark size as a fraction of the base image size
+    let watermarkAspect = watermarkImage.size.width / watermarkImage.size.height
+    var watermarkHeight = baseImage.size.height * scale
+    var watermarkWidth = watermarkHeight * watermarkAspect
+    
+    // Ensure the watermark does not exceed 10% of image's width
+    if watermarkWidth > baseImage.size.width * scale {
+        watermarkWidth = baseImage.size.width * scale
+        watermarkHeight = watermarkWidth / watermarkAspect
+    }
+
+    // Calculate position to place it at the bottom right corner
+    let watermarkX = baseImage.size.width - watermarkWidth - 20  // 20 points margin
+    let watermarkY = baseImage.size.height - watermarkHeight - 20  // 20 points margin
+    let watermarkRect = CGRect(x: watermarkX, y: watermarkY, size: CGSize(width: watermarkWidth, height: watermarkHeight))
+    
+    watermarkImage.draw(in: watermarkRect, blendMode: .normal, alpha: 0.5)  // Adjust alpha as desired
+    
+    let watermarkedImage = UIGraphicsGetImageFromCurrentImageContext()!
+    UIGraphicsEndImageContext()
+    
+    return watermarkedImage
 }
