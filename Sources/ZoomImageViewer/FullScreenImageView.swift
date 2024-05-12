@@ -201,7 +201,7 @@ func watermarkImage(baseImage: UIImage, watermarkImage: UIImage) -> UIImage {
     // Calculate position to place it at the bottom right corner
     let watermarkX = baseImage.size.width - watermarkWidth - 20  // 20 points margin
     let watermarkY = baseImage.size.height - watermarkHeight - 20  // 20 points margin
-    let watermarkRect = CGRect(x: watermarkX, y: watermarkY, size: CGSize(width: watermarkWidth, height: watermarkHeight))
+    let watermarkRect = CGRect(x: watermarkX, y: watermarkY, width: watermarkWidth, height: watermarkHeight)
     
     watermarkImage.draw(in: watermarkRect, blendMode: .normal, alpha: 0.5)  // Adjust alpha as desired
     
