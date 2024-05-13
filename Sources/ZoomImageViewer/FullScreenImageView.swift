@@ -49,9 +49,6 @@ struct FullScreenImageView<CloseButtonStyle: ButtonStyle>: View {
                 predictedOffset = value.predictedEndTranslation
             }
     }
-    @State private var image = UIImage()
-    @State private var showShareSheet = false
-
     private var buttons: some View {
         HStack {                                
                                 Button {
@@ -66,20 +63,10 @@ struct FullScreenImageView<CloseButtonStyle: ButtonStyle>: View {
                                 }
                                 .buttonStyle(closeButtonStyle)
                                 .opacity(backgroundOpacity)
-                                Button {
-                                    // Share watermarked image
-                                    let watermarked = watermarkImage(baseImage: baseImage ?? UIImage(), watermarkImage: watermark ?? UIImage())
-                                    self.image = watermarked ?? baseImage ?? UIImage()
-                                    print("Ready to share an image with size: \(watermarked!.size)")  // Debug statement
-                                    showShareSheet = true
-                                } label: {
-                                    Image(systemName: "square.and.arrow.up")
-                                        .font(.title)
-                                        .accessibilityLabel("Share")
-                                        .contentShape(Rectangle())
+                                if let processedImage = watermarkImage(baseImage: baseImage ?? UIImage(), watermarkImage: watermark ?? UIImage()) {
+                                    ShareLink(item: processedImage, preview: SharePreview("Weather Report: Future Radar", image: processedImage))
                                 }
-                                .buttonStyle(closeButtonStyle)
-                                .opacity(backgroundOpacity)
+                                
         }
     }
 
@@ -123,9 +110,6 @@ struct FullScreenImageView<CloseButtonStyle: ButtonStyle>: View {
                             buttons
                             , alignment: .topLeading
                         )
-                        .sheet(isPresented: $showShareSheet, content: {
-                            ActivityView(activityItems: [image] as [Any], applicationActivities: nil)
-                        })
                         .opacity(imageOpacity)
                         .onAppear(perform: onAppear)
                         .onDisappear(perform: onDisappear)
