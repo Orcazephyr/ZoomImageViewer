@@ -49,6 +49,9 @@ struct FullScreenImageView<CloseButtonStyle: ButtonStyle>: View {
                 predictedOffset = value.predictedEndTranslation
             }
     }
+    @State private var image = UIImage()
+    @State private var showShareSheet = false
+
     private var buttons: some View {
         HStack {                                
                                 Button {
@@ -63,10 +66,19 @@ struct FullScreenImageView<CloseButtonStyle: ButtonStyle>: View {
                                 }
                                 .buttonStyle(closeButtonStyle)
                                 .opacity(backgroundOpacity)
-                                if let processedImage = Image(uiImage: watermarkImage(baseImage: baseImage ?? UIImage(), watermarkImage: watermark ?? UIImage()) ?? UIImage()) {
-                                    ShareLink(item: processedImage, preview: SharePreview("Weather Report: Future Radar", image: processedImage))
+                                Button {
+                                    // Share watermarked image
+                                    let watermarked = watermarkImage(baseImage: baseImage ?? UIImage(), watermarkImage: watermark ?? UIImage())
+                                    self.image = watermarked ?? baseImage ?? UIImage()
+                                    showShareSheet = true
+                                } label: {
+                                    Image(systemName: "square.and.arrow.up")
+                                        .font(.title)
+                                        .accessibilityLabel("Share")
+                                        .contentShape(Rectangle())
                                 }
-                                
+                                .buttonStyle(closeButtonStyle)
+                                .opacity(backgroundOpacity)
         }
     }
 
@@ -110,6 +122,9 @@ struct FullScreenImageView<CloseButtonStyle: ButtonStyle>: View {
                             buttons
                             , alignment: .topLeading
                         )
+                        .sheet(isPresented: $showShareSheet, content: {
+                            ActivityView(activityItems: [image] as [Any], applicationActivities: nil)
+                        })
                         .opacity(imageOpacity)
                         .onAppear(perform: onAppear)
                         .onDisappear(perform: onDisappear)
@@ -181,8 +196,8 @@ func watermarkImage(baseImage: UIImage, watermarkImage: UIImage) -> UIImage? {
         // Draw the base image
         baseImage.draw(at: .zero)
         
-        // Define the scale as 10% of the base image's shorter dimension
-        let scale = 0.1
+        // Define the scale as 35% of the base image's shorter dimension
+        let scale = 0.35
         let watermarkAspect = watermarkImage.size.width / watermarkImage.size.height
         var watermarkHeight = min(baseImage.size.width, baseImage.size.height) * scale
         var watermarkWidth = watermarkHeight * watermarkAspect
@@ -201,7 +216,7 @@ func watermarkImage(baseImage: UIImage, watermarkImage: UIImage) -> UIImage? {
         let watermarkRect = CGRect(x: watermarkX, y: watermarkY, width: watermarkWidth, height: watermarkHeight)
 
         // Draw the watermark image
-        watermarkImage.draw(in: watermarkRect, blendMode: .normal, alpha: 0.5)  // Adjust alpha as desired
+        watermarkImage.draw(in: watermarkRect, blendMode: .normal, alpha: 0.85)  // Adjust alpha as desired
     }
 
     return watermarkedImage
