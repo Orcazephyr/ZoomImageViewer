@@ -63,7 +63,7 @@ struct FullScreenImageView<CloseButtonStyle: ButtonStyle>: View {
                                 }
                                 .buttonStyle(closeButtonStyle)
                                 .opacity(backgroundOpacity)
-                                if let processedImage = watermarkImage(baseImage: baseImage ?? UIImage(), watermarkImage: watermark ?? UIImage()) {
+                                if let processedImage = Image(uiImage: watermarkImage(baseImage: baseImage ?? UIImage(), watermarkImage: watermark ?? UIImage())) {
                                     ShareLink(item: processedImage, preview: SharePreview("Weather Report: Future Radar", image: processedImage))
                                 }
                                 
