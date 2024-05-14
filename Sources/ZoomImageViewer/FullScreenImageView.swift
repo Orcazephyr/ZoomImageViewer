@@ -69,7 +69,7 @@ struct FullScreenImageView<CloseButtonStyle: ButtonStyle>: View {
                                 Button {
                                     // Share watermarked image
                                     let watermarked = (watermark == nil) ? baseImage : watermarkImage(baseImage: baseImage ?? UIImage(), watermarkImage: watermark ?? UIImage())
-                                    self.image = convertHEICToJPEG(watermarked ?? baseImage ?? UIImage())
+                                    self.image = convertHEICToJPEG(image: watermarked ?? baseImage ?? UIImage())
                                     showShareSheet = true
                                 } label: {
                                     Image(systemName: "square.and.arrow.up")
@@ -191,7 +191,7 @@ struct ActivityView: UIViewControllerRepresentable {
 
 func convertHEICToJPEG(image: UIImage) -> UIImage {
     if let jpegData = image.jpegData(compressionQuality: 0.8) {
-        return UIImage(data: jpegData)
+        return UIImage(data: jpegData) ?? image
     }
     return image
 }
